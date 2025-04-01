@@ -1,131 +1,100 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState } from 'react';
 import {
-  ScrollView,
-  StatusBar,
+  SafeAreaView,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
+  ScrollView,
+  StatusBar
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import TripPDFGenerator from './src/tripPDFGenerator';
+import sampleTripData from './src/sampleTripData';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const App: React.FC = () => {
+  const [generatedPdfPath, setGeneratedPdfPath] = useState<string | null>(null);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const handlePdfComplete = (filePath: string): void => {
+    setGeneratedPdfPath(filePath);
+    console.log('PDF generated at:', filePath);
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the reccomendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
-
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.header}>
+          <Text style={styles.title}>MyTrip PDF Generator</Text>
         </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+
+        <View style={styles.content}>
+          <Text style={styles.description}>
+            Generates an A4-sized PDF from your trip data.
+          </Text>
+
+          <TripPDFGenerator
+            tripData={sampleTripData}
+            onComplete={handlePdfComplete}
+          />
+
+          {generatedPdfPath && (
+            <View style={styles.resultContainer}>
+              <Text style={styles.resultText}>PDF generated successfully!</Text>
+              <Text style={styles.resultPath}>{generatedPdfPath}</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5'
   },
-  sectionTitle: {
+  scrollView: {
+    flexGrow: 1
+  },
+  header: {
+    backgroundColor: '#2a3352',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    alignItems: 'center'
+  },
+  title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: 'bold',
+    color: '#ffffff'
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  content: {
+    padding: 16
   },
-  highlight: {
-    fontWeight: '700',
+  description: {
+    fontSize: 16,
+    marginBottom: 14,
+    lineHeight: 24,
+    color: '#333333'
   },
+  resultContainer: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#e6f7ff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#91d5ff'
+  },
+  resultText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0066cc',
+    marginBottom: 8
+  },
+  resultPath: {
+    fontSize: 14,
+    color: '#666666'
+  }
 });
 
 export default App;
